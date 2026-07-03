@@ -1,0 +1,22 @@
+# Python Virtual Environment
+venv/
+.venv/
+env/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Arduino User Directory (board/library downloads, generated dynamically)
+arduino_user/
+
+# Disk Cache (contains compiled hex file cache)
+hex_cache.json
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
