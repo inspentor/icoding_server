@@ -13,6 +13,7 @@ arduino_user/
 
 # Disk Cache (contains compiled hex file cache)
 hex_cache.json
+last_update.txt
 
 # Operating System Files
 .DS_Store

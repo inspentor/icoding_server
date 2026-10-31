@@ -149,7 +149,7 @@ queue_manager = CompileQueueManager()
 app = Flask(__name__)
 # Configure Flask request limit (100KB)
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
-CORS(app, resources={r"/*": {"origins": "*"}}, methods=["GET", "POST", "OPTIONS"], allow_headers=["Content-Type"], expose_headers=["X-Queue-Position", "X-Estimated-Wait-Seconds"])
+CORS(app, resources={r"/*": {"origins": "*"}}, methods=["GET", "POST", "OPTIONS"], allow_headers=["Content-Type", "X-Client-Key", "Authorization", "*"], expose_headers=["X-Queue-Position", "X-Estimated-Wait-Seconds"])
 
 # STEP 10: Start Flask server and print banner
 libs_count = scheduler.get_status()['libraries_installed']
@@ -158,15 +158,30 @@ optimal_workers = queue_manager.status()['max_workers']
 # Initialise premium auth database tables (will warn gracefully if DB not configured yet)
 auth_db.init_db()
 
-print("┌─────────────────────────────────────┐")
-print("│   Arduino Compilation Server        │")
-print(f"│   CLI:     arduino-cli {cli_version:<13}│")
-print(f"│   Workers: {optimal_workers:<24}│")
-print(f"│   Cache:   {loaded_entries:<25}│")
-print(f"│   Libs:    {libs_count:<25}│")
-print(f"│   URL:     http://0.0.0.0:5000      │")
-print(f"│   Premium: /compile/premium (JWT)   │")
-print("└─────────────────────────────────────┘")
+import socket
+def _get_lan_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('1.1.1.1', 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return '127.0.0.1'
+
+_lan_ip = _get_lan_ip()
+
+print("┌───────────────────────────────────────────────┐")
+print("│   Arduino Compilation Server                  │")
+print(f"│   CLI:       arduino-cli {cli_version:<13}│")
+print(f"│   Workers:   {optimal_workers:<25}│")
+print(f"│   Cache:     {loaded_entries:<25}│")
+print(f"│   Libs:      {libs_count:<25}│")
+print(f"│   URL:       http://0.0.0.0:5000              │")
+print(f"│   Local URL: http://localhost:5000            │")
+print(f"│   LAN URL:   http://{_lan_ip}:5000{' ' * max(0, 19 - len(_lan_ip))}│")
+print(f"│   Premium:   /compile/premium (JWT)           │")
+print("└───────────────────────────────────────────────┘")
 
 # ═══════════════════════════════════════
 # GLOBAL ERROR HANDLING
